@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const Center(
         child: Text(
-            "Pantalla 1: Especialidades (En construcción)")), // EspecialidadesScreen()
+            "Pantalla 1: Especialidades (En construcción)uwu")), // EspecialidadesScreen()
     const Center(
         child: Text(
             "Pantalla 2: Info CBTIS 66 (En construcción)")), // InfoScreen()
