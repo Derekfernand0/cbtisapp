@@ -1,11 +1,9 @@
+// lib/features/home/main_screen.dart
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
-
-// Importaremos los placeholders (asegúrate de crear archivos vacíos básicos para estos o usa Containers por ahora)
-// import '../specialties/specialties_screen.dart';
-// import '../info/info_screen.dart';
-// import '../test/test_screen.dart';
-// import '../requirements/requirements_screen.dart';
+import '../specialties/specialties_screen.dart';
+import '../info/info_screen.dart';
+import '../test/test_screen.dart';
+import '../requirements/requirements_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,45 +14,60 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  // Agregamos el PageController para manejar el scroll horizontal
+  late PageController _pageController;
 
-  // Lista de las 4 pantallas principales
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    // Es muy importante liberar el controlador de la memoria
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  // Nuestras pantallas
   final List<Widget> _screens = [
-    const Center(
-        child: Text(
-            "Pantalla 1: Especialidades (En construcción)uwu")), // EspecialidadesScreen()
-    const Center(
-        child: Text(
-            "Pantalla 2: Info CBTIS 66 (En construcción)")), // InfoScreen()
-    const Center(
-        child: Text(
-            "Pantalla 3: Test Vocacional (En construcción)")), // TestScreen()
-    const Center(
-        child: Text(
-            "Pantalla 4: Requisitos (En construcción)")), // RequirementsScreen()
+    const SpecialtiesScreen(),
+    const InfoScreen(),
+    const TestScreen(),
+    const RequirementsScreen(),
   ];
+
+  // Se ejecuta cuando el usuario desliza la pantalla con el dedo
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  // Se ejecuta cuando el usuario toca un icono de la barra inferior
+  void _onItemTapped(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // PageTransitionSwitcher de la librería animations para cambios suaves
-      body: PageTransitionSwitcher(
-        duration: const Duration(milliseconds: 500),
-        transitionBuilder: (child, animation, secondaryAnimation) {
-          return FadeThroughTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-        child: _screens[_currentIndex],
+      // Reemplazamos el PageTransitionSwitcher por el PageView
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        // BouncingScrollPhysics le da ese efecto de rebote elástico al llegar a los bordes
+        physics: const BouncingScrollPhysics(),
+        children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.engineering),
