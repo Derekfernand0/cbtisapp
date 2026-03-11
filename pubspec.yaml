@@ -33,3 +33,6 @@ flutter:
     - assets/images/
     - assets/videos/
     - assets/icons/
+
+dependency_overrides:
+  flutter_inappwebview: ^6.0.0
