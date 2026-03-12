@@ -12,6 +12,8 @@ dependencies:
   # UI y Diseño
   google_fonts: ^6.1.0
   animations: ^2.0.11
+
+  flutter_svg: ^2.0.10
   # Gráficas
   fl_chart: ^0.65.0
   # Videos
