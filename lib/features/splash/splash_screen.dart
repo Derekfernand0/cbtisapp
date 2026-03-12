@@ -16,12 +16,14 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  // Animaciones para la fusión de las piezas
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-  late Animation<Offset> _slideAnimationShield;
-  late Animation<Offset> _slideAnimationCap;
-  late Animation<Offset> _slideAnimationElements;
+  // Animaciones independientes para cada pieza
+  late Animation<double> _shieldScale;
+  late Animation<double> _elementsScale;
+  late Animation<Offset> _capDrop;
+
+  // Animación para los textos
+  late Animation<double> _textOpacity;
+  late Animation<Offset> _textSlide;
 
   @override
   void initState() {
@@ -29,52 +31,51 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration:
-          const Duration(milliseconds: 2500), // Duración total de la fusión
+      duration: const Duration(
+          milliseconds:
+              3000), // Animación un poco más larga para apreciar los detalles
     );
 
-    // 1. Escala y Opacidad base para la aparición suave
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+    // 1. El escudo aparece desde cero inflandose con un pequeño rebote
+    _shieldScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
           parent: _controller,
-          curve: const Interval(0.0, 0.6, curve: Curves.easeOutBack)),
-    );
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.0, 0.6, curve: Curves.easeIn)),
+          curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack)),
     );
 
-    // 2. Deslizamiento de las piezas principales para la "fusión"
-    // El escudo central se desliza ligeramente hacia arriba
-    _slideAnimationShield =
-        Tween<Offset>(begin: const Offset(0.0, 0.2), end: Offset.zero).animate(
+    // 2. Los elementos internos hacen un "Pop" elástico desde el centro
+    _elementsScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
           parent: _controller,
-          curve: const Interval(0.2, 0.8, curve: Curves.easeInOutCubic)),
+          curve: const Interval(0.3, 0.7, curve: Curves.elasticOut)),
     );
 
-    // El birrete baja desde arriba
-    _slideAnimationCap =
-        Tween<Offset>(begin: const Offset(0.0, -0.5), end: Offset.zero).animate(
+    // 3. El birrete cae desde arriba y rebota al chocar con el escudo
+    _capDrop =
+        Tween<Offset>(begin: const Offset(0.0, -1.5), end: Offset.zero).animate(
       CurvedAnimation(
           parent: _controller,
-          curve: const Interval(0.4, 0.9, curve: Curves.easeInOutCubic)),
+          curve: const Interval(0.5, 1.0, curve: Curves.bounceOut)),
     );
 
-    // Los elementos internos (libro, manos, etc.) convergen desde los lados
-    _slideAnimationElements =
-        Tween<Offset>(begin: const Offset(0.3, 0.0), end: Offset.zero).animate(
+    // Animaciones del texto inferior (Aparece al final)
+    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
           parent: _controller,
-          curve: const Interval(0.5, 1.0, curve: Curves.easeInOutCubic)),
+          curve: const Interval(0.7, 1.0, curve: Curves.easeIn)),
+    );
+    _textSlide =
+        Tween<Offset>(begin: const Offset(0.0, 0.5), end: Offset.zero).animate(
+      CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)),
     );
 
     // Iniciar la animación
     _controller.forward();
 
-    // Navegación automática después de que la fusión termina y se mantiene un momento
-    Timer(const Duration(milliseconds: 3500), () {
+    // Navegación automática después de 4.5 segundos
+    Timer(const Duration(milliseconds: 4500), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -96,117 +97,106 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Como el logo ya tiene sus propios colores, oscurecemos un poco el fondo
+    // para que los blancos, dorados y guindas del logo resalten al 100%.
     return Scaffold(
-      backgroundColor: AppTheme.burgundy,
+      backgroundColor:
+          const Color(0xFF1A1A1A), // Un gris muy oscuro/casi negro elegante
       body: Center(
-        child: FadeTransition(
-          opacity: _opacityAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Contenedor del logo con animaciones de fusión
-                Stack(
-                  alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Contenedor fijo para que las piezas compartan la misma proporción
+            SizedBox(
+              width: 220,
+              height: 220,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Capa 1: El Escudo Base (sin colorFilter para mantener colores originales)
+                  ScaleTransition(
+                    scale: _shieldScale,
+                    child: SvgPicture.asset(
+                      'assets/icons/logo_pieces_shield.svg',
+                      width: 220,
+                      height: 220,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  // Capa 2: Elementos Internos
+                  ScaleTransition(
+                    scale: _elementsScale,
+                    child: SvgPicture.asset(
+                      'assets/icons/logo_pieces_elements.svg',
+                      width: 220,
+                      height: 220,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  // Capa 3: El Birrete
+                  SlideTransition(
+                    position: _capDrop,
+                    child: SvgPicture.asset(
+                      'assets/icons/logo_pieces_cap.svg',
+                      width: 220,
+                      height: 220,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // Textos de Bienvenida
+            FadeTransition(
+              opacity: _textOpacity,
+              child: SlideTransition(
+                position: _textSlide,
+                child: Column(
                   children: [
-                    // Capa 1: El Escudo Base (se fusiona desde abajo)
-                    SlideTransition(
-                      position: _slideAnimationShield,
-                      child: SvgPicture.asset(
-                        'assets/icons/logo_pieces_shield.svg', // Reemplaza con tu SVG vectorizado
-                        height: 180,
-                        colorFilter: const ColorFilter.mode(
-                            AppTheme.white, BlendMode.srcIn),
-                      ),
+                    Text(
+                      'Bienvenido a',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 1.5,
+                          ),
                     ),
-
-                    // Capa 2: El Birrete (baja desde arriba)
-                    SlideTransition(
-                      position: _slideAnimationCap,
-                      child: SvgPicture.asset(
-                        'assets/icons/logo_pieces_cap.svg', // Reemplaza con tu SVG vectorizado
-                        height: 180,
-                        colorFilter: const ColorFilter.mode(
-                            AppTheme.white, BlendMode.srcIn),
-                      ),
+                    Text(
+                      'CBTIS 66',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                            color: Colors.white,
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
                     ),
-
-                    // Capa 3: Elementos Internos (convergen desde los lados)
-                    SlideTransition(
-                      position: _slideAnimationElements,
-                      child: SvgPicture.asset(
-                        'assets/icons/logo_pieces_elements.svg', // Reemplaza con tu SVG vectorizado
-                        height: 180,
-                        colorFilter: const ColorFilter.mode(
-                            AppTheme.white, BlendMode.srcIn),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.burgundy.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Explora nuestras especialidades',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white,
+                              letterSpacing: 1.0,
+                            ),
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 30),
-
-                // Texto de bienvenida animado
-                _buildAnimatedText(
-                  'Bienvenido a',
-                  Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.white,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 1.5,
-                      ),
-                  startInterval: 0.6,
-                ),
-                _buildAnimatedText(
-                  'CBTIS 66',
-                  Theme.of(context).textTheme.displayLarge?.copyWith(
-                        color: AppTheme.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                      ),
-                  startInterval: 0.7,
-                ),
-                const SizedBox(height: 10),
-                _buildAnimatedText(
-                  'Explora nuestras especialidades',
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.white.withOpacity(0.8),
-                        letterSpacing: 1.2,
-                      ),
-                  startInterval: 0.8,
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      ),
-    );
-  }
-
-  // Widget auxiliar para animar la aparición del texto en cascada
-  Widget _buildAnimatedText(String text, TextStyle? style,
-      {required double startInterval}) {
-    final animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve:
-            Interval(startInterval, startInterval + 0.2, curve: Curves.easeIn),
-      ),
-    );
-
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0.0, 0.3), end: Offset.zero)
-            .animate(
-          CurvedAnimation(
-            parent: _controller,
-            curve: Interval(startInterval, startInterval + 0.2,
-                curve: Curves.easeOutCubic),
-          ),
-        ),
-        child: Text(text, style: style),
       ),
     );
   }
