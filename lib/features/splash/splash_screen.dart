@@ -1,9 +1,10 @@
-// lib/features/splash/splash_screen.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_theme.dart';
 import '../home/main_screen.dart';
+import '../video/intro_video_flow_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,14 +17,14 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  // Animaciones independientes para cada pieza
   late Animation<double> _shieldScale;
   late Animation<double> _elementsScale;
   late Animation<Offset> _capDrop;
-
-  // Animación para los textos
   late Animation<double> _textOpacity;
   late Animation<Offset> _textSlide;
+
+  Timer? _navigationTimer;
+  bool _navigated = false;
 
   @override
   void initState() {
@@ -31,51 +32,74 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(
-          milliseconds:
-              3000), // Animación un poco más larga para apreciar los detalles
+      duration: const Duration(milliseconds: 3000),
     );
 
-    // 1. El escudo aparece desde cero inflandose con un pequeño rebote
     _shieldScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack)),
+        parent: _controller,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
+      ),
     );
 
-    // 2. Los elementos internos hacen un "Pop" elástico desde el centro
     _elementsScale = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.3, 0.7, curve: Curves.elasticOut)),
+        parent: _controller,
+        curve: const Interval(0.3, 0.7, curve: Curves.elasticOut),
+      ),
     );
 
-    // 3. El birrete cae desde arriba y rebota al chocar con el escudo
     _capDrop =
-        Tween<Offset>(begin: const Offset(0.0, -1.5), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0.0, -1.5), end: Offset.zero)
+            .animate(
       CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.5, 1.0, curve: Curves.bounceOut)),
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.bounceOut),
+      ),
     );
 
-    // Animaciones del texto inferior (Aparece al final)
     _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.7, 1.0, curve: Curves.easeIn)),
-    );
-    _textSlide =
-        Tween<Offset>(begin: const Offset(0.0, 0.5), end: Offset.zero).animate(
-      CurvedAnimation(
-          parent: _controller,
-          curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic)),
+        parent: _controller,
+        curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
+      ),
     );
 
-    // Iniciar la animación
+    _textSlide =
+        Tween<Offset>(begin: const Offset(0.0, 0.5), end: Offset.zero)
+            .animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
+
     _controller.forward();
 
-    // Navegación automática después de 4.5 segundos
-    Timer(const Duration(milliseconds: 4500), () {
+    _navigationTimer = Timer(const Duration(milliseconds: 4500), () {
+      _handleNavigation();
+    });
+  }
+
+  Future<void> _handleNavigation() async {
+    if (!mounted || _navigated) return;
+    _navigated = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    final introSeen = prefs.getBool('intro_seen') ?? false;
+
+    if (!mounted) return;
+
+    if (!introSeen) {
+      await prefs.setBool('intro_seen', true);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const IntroVideoFlowScreen(),
+        ),
+      );
+    } else {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -86,34 +110,30 @@ class _SplashScreenState extends State<SplashScreen>
           },
         ),
       );
-    });
+    }
   }
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Como el logo ya tiene sus propios colores, oscurecemos un poco el fondo
-    // para que los blancos, dorados y guindas del logo resalten al 100%.
     return Scaffold(
-      backgroundColor:
-          const Color(0xFF1A1A1A), // Un gris muy oscuro/casi negro elegante
+      backgroundColor: const Color(0xFF1A1A1A),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Contenedor fijo para que las piezas compartan la misma proporción
             SizedBox(
               width: 220,
               height: 220,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Capa 1: El Escudo Base (sin colorFilter para mantener colores originales)
                   ScaleTransition(
                     scale: _shieldScale,
                     child: SvgPicture.asset(
@@ -123,8 +143,6 @@ class _SplashScreenState extends State<SplashScreen>
                       fit: BoxFit.contain,
                     ),
                   ),
-
-                  // Capa 2: Elementos Internos
                   ScaleTransition(
                     scale: _elementsScale,
                     child: SvgPicture.asset(
@@ -134,8 +152,6 @@ class _SplashScreenState extends State<SplashScreen>
                       fit: BoxFit.contain,
                     ),
                   ),
-
-                  // Capa 3: El Birrete
                   SlideTransition(
                     position: _capDrop,
                     child: SvgPicture.asset(
@@ -148,10 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ],
               ),
             ),
-
             const SizedBox(height: 40),
-
-            // Textos de Bienvenida
             FadeTransition(
               opacity: _textOpacity,
               child: SlideTransition(
@@ -178,7 +191,9 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 6),
+                        horizontal: 15,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.burgundy.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(20),

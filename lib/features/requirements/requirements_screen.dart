@@ -100,7 +100,7 @@ class RequirementsScreen extends StatelessWidget {
                           offset: const Offset(0, 4),
                         ),
                       ],
-                      border: Border(
+                      border: const Border(
                         left: BorderSide(
                           color: AppTheme.burgundy,
                           width: 5,
