@@ -247,7 +247,7 @@ class SpecialtiesScreen extends StatelessWidget {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
