@@ -83,7 +83,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Ing. Industrial
 • Ing. Mecatrónica
 • Ing. Robótica''',
-    videoUrl: 'assets/videos/SP.mp4',
+    videoUrl: 'assets/videos/SM.mp4',
   ),
   Specialty(
     id: 'ciber',
