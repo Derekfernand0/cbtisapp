@@ -1,9 +1,17 @@
 // lib/features/requirements/requirements_screen.dart
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_theme.dart';
 
 class RequirementsScreen extends StatelessWidget {
   const RequirementsScreen({super.key});
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      debugPrint('No se pudo abrir $urlString');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +41,11 @@ class RequirementsScreen extends StatelessWidget {
       {
         'icon': Icons.edit_document,
         'text': 'Llenar formato de datos del aspirante'
+      },
+      {
+        'icon': Icons.ads_click,
+        'text': 'Ver proceso de inscripción completo (Página oficial)',
+        'url': 'https://www.cbtis66.edu.mx/aspirantes/proceso'
       },
     ];
 
@@ -110,6 +123,11 @@ class RequirementsScreen extends StatelessWidget {
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
+                      onTap: () {
+                        if (item.containsKey('url')) {
+                          _launchUrl(item['url']);
+                        }
+                      },
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(

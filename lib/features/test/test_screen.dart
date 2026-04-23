@@ -224,11 +224,14 @@ class _TestScreenState extends State<TestScreen> {
     );
   }
 
-  // UI de los Resultados (Gráfica)
+  // UI de los Resultados (Gráfica y Top 3)
   Widget _buildResults() {
-    // Buscar la especialidad ganadora
-    String topSpecialty =
-        _scores.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+    // 1. Ordenamos las especialidades de mayor a menor puntaje
+    var sortedScores = _scores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value)); // Orden descendente
+
+    // 2. Extraemos el Top 3
+    var top3 = sortedScores.take(3).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
@@ -243,24 +246,87 @@ class _TestScreenState extends State<TestScreen> {
                 .displayLarge
                 ?.copyWith(fontSize: 28),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Text(
-            'Tu perfil se inclina más hacia:',
-            style: Theme.of(context).textTheme.bodyLarge,
+            'Tus áreas de mayor compatibilidad:',
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
-          Text(
-            topSpecialty,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppTheme.burgundy,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-          ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 15),
 
-          // Contenedor de la Gráfica
+          // --- NUEVO: MOSTRAR EL TOP 3 ---
           Container(
-            height: 300,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: AppTheme.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // 🥇 Primer Lugar
+                ListTile(
+                  leading: const Icon(Icons.looks_one,
+                      color: Colors.amber, size: 36),
+                  title: Text(
+                    top3[0].key,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: AppTheme.burgundy),
+                  ),
+                  trailing: Text(
+                    '${top3[0].value} pts',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+                const Divider(),
+                // 🥈 Segundo Lugar
+                ListTile(
+                  leading:
+                      const Icon(Icons.looks_two, color: Colors.grey, size: 30),
+                  title: Text(
+                    top3[1].key,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
+                  trailing: Text(
+                    '${top3[1].value} pts',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+                const Divider(),
+                // 🥉 Tercer Lugar
+                ListTile(
+                  leading:
+                      const Icon(Icons.looks_3, color: Colors.brown, size: 30),
+                  title: Text(
+                    top3[2].key,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
+                  trailing: Text(
+                    '${top3[2].value} pts',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
+          // Contenedor de la Gráfica (Se mantiene igual para contexto visual)
+          Container(
+            height: 250,
             padding: const EdgeInsets.only(top: 20, right: 20, bottom: 10),
             decoration: BoxDecoration(
               color: AppTheme.white,
@@ -276,7 +342,7 @@ class _TestScreenState extends State<TestScreen> {
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
-                maxY: 15, // Puntuación máxima posible (5 preguntas * 3 puntos)
+                maxY: 15,
                 barTouchData: BarTouchData(enabled: false),
                 titlesData: FlTitlesData(
                   show: true,
@@ -337,7 +403,7 @@ class _TestScreenState extends State<TestScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 30),
 
           // Botón para reiniciar
           OutlinedButton.icon(

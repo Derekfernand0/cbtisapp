@@ -34,11 +34,13 @@ class SpecialtiesScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'Oferta Educativa',
-                          style:
-                              Theme.of(context).textTheme.displayLarge?.copyWith(
-                                    color: AppTheme.white,
-                                    fontSize: 32,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayLarge
+                              ?.copyWith(
+                                color: AppTheme.white,
+                                fontSize: 32,
+                              ),
                         ),
                       ),
                       GestureDetector(
@@ -77,14 +79,15 @@ class SpecialtiesScreen extends StatelessWidget {
                   child: ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     children: [
+                      // --- BOTÓN DE VIDEO INFORMATIVO CON PORTADA ---
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                         child: GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const VideoPlayerScreen(
+                                builder: (context) => const VideoPlayerScreen(
                                   videoAssetPath: 'assets/videos/video2.mp4',
                                   title: 'Video informativo',
                                   skipText: 'Cerrar',
@@ -93,9 +96,16 @@ class SpecialtiesScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            constraints: const BoxConstraints(minHeight: 130),
+                            height: 150, // Altura ajustada para que no estorbe
+                            width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
+                              image: const DecorationImage(
+                                // ⚠️ ASEGÚRATE de que esta imagen exista en tus assets
+                                image: AssetImage(
+                                    'assets/images/portada_video.png'),
+                                fit: BoxFit.cover,
+                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.3),
@@ -103,78 +113,37 @@ class SpecialtiesScreen extends StatelessWidget {
                                   offset: const Offset(0, 4),
                                 ),
                               ],
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white.withOpacity(0.15),
-                                  Colors.white.withOpacity(0.05),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.25),
-                              ),
                             ),
-                            child: IntrinsicHeight(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.black
+                                    .withOpacity(0.3), // Capa oscura sutil
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    width: 95,
-                                    decoration: BoxDecoration(
-                                      borderRadius:
-                                          const BorderRadius.horizontal(
-                                        left: Radius.circular(20),
-                                      ),
-                                      color: Colors.black.withOpacity(0.25),
-                                    ),
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.ondemand_video,
-                                        color: Colors.white,
-                                        size: 44,
-                                      ),
-                                    ),
+                                  const Icon(
+                                    Icons.play_circle_fill,
+                                    color: Colors.white,
+                                    size: 50,
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                        horizontal: 14,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Ver video informativo',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                  color: AppTheme.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            'Conoce más sobre CBTIS 66 antes de explorar las especialidades.',
-                                            maxLines: 3,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: Colors.white70,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Ver video informativo',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: [
+                                        const Shadow(
+                                          blurRadius: 10.0,
+                                          color: Colors.black,
+                                          offset: Offset(2.0, 2.0),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],

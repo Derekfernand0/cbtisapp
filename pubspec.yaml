@@ -23,7 +23,7 @@ dependencies:
   # Gestión de Estado
   flutter_riverpod: ^2.4.9
 
-  video_player: ^2.9.1
+  video_player: ^2.8.1
   shared_preferences: ^2.2.3
   
 dev_dependencies:

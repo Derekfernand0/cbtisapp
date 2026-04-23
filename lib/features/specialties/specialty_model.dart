@@ -37,7 +37,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Ing. en Tecnologías computacionales
 • Lic. en Analista de sistemas
 • Lic. Bioinformática''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/PR.mp4',
   ),
   Specialty(
     id: 'elec',
@@ -60,7 +60,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Ing. en Energías renovables
 • Ing. Electrónica
 • Ing. en Programación PLC''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/EL.mp4',
   ),
   Specialty(
     id: 'soporte',
@@ -83,7 +83,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Ing. Industrial
 • Ing. Mecatrónica
 • Ing. Robótica''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/SP.mp4',
   ),
   Specialty(
     id: 'ciber',
@@ -102,7 +102,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Ingeniería en inteligencia de datos
 • Inteligencia en ciberseguridad
 • Ingeniería informática''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/CI.mp4',
   ),
   Specialty(
     id: 'conta',
@@ -122,7 +122,7 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Lic. en Economía
 • Lic. en Gestión y dirección de negocios
 • Lic. en Administración de empresas turísticas''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/CO.mp4',
   ),
   Specialty(
     id: 'alim',
@@ -156,6 +156,6 @@ INGRESO AL NIVEL SUPERIOR EN:
 • Lic. en Enfermería
 • Lic. en Médico cirujano
 • Lic. en Nutrición''',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: 'assets/videos/AL.mp4',
   ),
 ];
