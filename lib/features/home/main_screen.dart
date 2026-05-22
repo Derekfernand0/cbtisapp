@@ -33,9 +33,9 @@ class _MainScreenState extends State<MainScreen> {
   // Nuestras pantallas
   final List<Widget> _screens = [
     const SpecialtiesScreen(),
-    const InfoScreen(),
     const TestScreen(),
     const RequirementsScreen(),
+    const InfoScreen(),
   ];
 
   // Se ejecuta cuando el usuario desliza la pantalla con el dedo
@@ -74,16 +74,16 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Especialidades',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'CBTIS 66',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.assignment),
             label: 'Test',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
             label: 'Requisitos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: 'CBTIS 66',
           ),
         ],
       ),

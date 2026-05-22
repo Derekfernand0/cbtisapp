@@ -40,11 +40,7 @@ class RequirementsScreen extends StatelessWidget {
       {'icon': Icons.folder, 'text': 'Un folder tamaño carta azul marino'},
       {
         'icon': Icons.edit_document,
-        'text': 'Llenar formato de datos del aspirante'
-      },
-      {
-        'icon': Icons.ads_click,
-        'text': 'Ver proceso de inscripción completo (Página oficial)',
+        'text': 'Llenar formato de datos del aspirante(click)',
         'url': 'https://www.cbtis66.edu.mx/aspirantes/proceso'
       },
     ];
