@@ -1,9 +1,11 @@
 // lib/features/splash/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../../core/theme/app_theme.dart';
 import '../home/main_screen.dart';
+import '../video/intro_video_flow_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -137,13 +139,31 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navegación Automática (5 segundos para apreciar todo)
-    Timer(const Duration(milliseconds: 5000), () {
+    // Navegación Automática (5 segundos para apreciar la animación)
+    Timer(const Duration(milliseconds: 5000), () async {
+      // 1. Verificamos si es la primera vez que se abre la app
+      final prefs = await SharedPreferences.getInstance();
+      final isFirstTime = prefs.getBool('isFirstTime') ?? true;
+
+      Widget nextScreen;
+
+      if (isFirstTime) {
+        // Si es la primera vez, marcamos que ya entró y lo mandamos al video
+        await prefs.setBool('isFirstTime', false);
+        nextScreen = const IntroVideoFlowScreen();
+      } else {
+        // Si ya había entrado antes, va directo al menú principal
+        nextScreen = const MainScreen();
+      }
+
+      if (!mounted) return;
+
+      // 2. Hacemos la transición suave hacia la pantalla elegida
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (_, __, ___) => const MainScreen(),
+          pageBuilder: (_, __, ___) => nextScreen,
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },

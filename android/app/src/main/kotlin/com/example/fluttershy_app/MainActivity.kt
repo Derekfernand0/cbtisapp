@@ -1,4 +1,4 @@
-package com.example.fluttershy_app
+package mx.edu.cbtis66.orientacion
 
 import io.flutter.embedding.android.FlutterActivity
 
